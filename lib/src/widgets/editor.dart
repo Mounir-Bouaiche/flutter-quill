@@ -149,13 +149,13 @@ abstract class RenderAbstractEditor implements TextLayoutMetrics {
 class QuillEditor extends StatefulWidget {
   const QuillEditor({
     required this.controller,
-    required this.focusNode,
-    required this.scrollController,
-    required this.scrollable,
-    required this.padding,
-    required this.autoFocus,
-    required this.readOnly,
-    required this.expands,
+    this.focusNode,
+    this.scrollController,
+    this.scrollable = false,
+    this.padding = EdgeInsets.zero,
+    this.autoFocus = true,
+    this.readOnly = false,
+    this.expands = false,
     this.showCursor,
     this.paintCursorAboveText,
     this.placeholder,
@@ -212,9 +212,8 @@ class QuillEditor extends StatefulWidget {
   }) {
     return QuillEditor(
       controller: controller,
-      scrollController: ScrollController(),
       scrollable: true,
-      focusNode: focusNode ?? FocusNode(),
+      focusNode: focusNode,
       autoFocus: autoFocus,
       readOnly: readOnly,
       expands: expands,
@@ -233,10 +232,10 @@ class QuillEditor extends StatefulWidget {
   final QuillController controller;
 
   /// Controls whether this editor has keyboard focus.
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
 
   /// The [ScrollController] to use when vertically scrolling the contents.
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
 
   /// Whether this editor should create a scrollable container for its content.
   ///
@@ -505,8 +504,8 @@ class QuillEditorState extends State<QuillEditor>
     final child = RawEditor(
       key: _editorKey,
       controller: widget.controller,
-      focusNode: widget.focusNode,
-      scrollController: widget.scrollController,
+      focusNode: widget.focusNode ?? FocusNode(),
+      scrollController: widget.scrollController ?? ScrollController(),
       scrollable: widget.scrollable,
       scrollBottomInset: widget.scrollBottomInset,
       padding: widget.padding,
