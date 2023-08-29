@@ -6,9 +6,11 @@ import '../models/structs/link_dialog_action.dart';
 import '../models/themes/quill_custom_button.dart';
 import '../models/themes/quill_dialog_theme.dart';
 import '../models/themes/quill_icon_theme.dart';
+import '../models/themes/quill_theme_data.dart';
 import '../translations/toolbar.i18n.dart';
 import 'controller.dart';
 import 'embeds.dart';
+import 'theme.dart';
 import 'toolbar/arrow_indicated_button_list.dart';
 import 'toolbar/clear_format_button.dart';
 import 'toolbar/color_button.dart';
@@ -66,6 +68,8 @@ class QuillToolbar extends StatelessWidget implements PreferredSizeWidget {
     this.sectionDividerColor,
     this.sectionDividerSpace,
     this.linkDialogAction,
+    this.dialogTheme,
+    this.iconTheme,
     Key? key,
   }) : super(key: key);
 
@@ -120,10 +124,12 @@ class QuillToolbar extends StatelessWidget implements PreferredSizeWidget {
     List<EmbedButtonBuilder>? embedButtons,
 
     ///The theme to use for the icons in the toolbar, uses type [QuillIconTheme]
+    @Deprecated('Use the inherited Widget [QuillTheme] instead')
     QuillIconTheme? iconTheme,
 
     ///The theme to use for the theming of the [LinkDialog()],
     ///shown when embedding an image, for example
+    @Deprecated('Use the inherited Widget [QuillTheme] instead')
     QuillDialogTheme? dialogTheme,
 
     /// Callback to be called after any button on the toolbar is pressed.
@@ -256,6 +262,8 @@ class QuillToolbar extends StatelessWidget implements PreferredSizeWidget {
       customButtons: customButtons,
       locale: locale,
       afterButtonPressed: afterButtonPressed,
+      iconTheme: iconTheme,
+      dialogTheme: dialogTheme,
       children: [
         if (showUndo)
           HistoryButton(
@@ -408,7 +416,7 @@ class QuillToolbar extends StatelessWidget implements PreferredSizeWidget {
           ),
         if (embedButtons != null)
           for (final builder in embedButtons)
-            builder(controller, toolbarIconSize, iconTheme, dialogTheme),
+            builder(controller, toolbarIconSize),
         if (showDividers &&
             isButtonGroupShown[0] &&
             (isButtonGroupShown[1] ||
@@ -628,6 +636,15 @@ class QuillToolbar extends StatelessWidget implements PreferredSizeWidget {
   /// The space occupied by toolbar section divider.
   final double? sectionDividerSpace;
 
+  ///The theme to use for the icons in the toolbar, uses type [QuillIconTheme]
+  @Deprecated('Use the inherited Widget [QuillTheme] instead')
+  final QuillIconTheme? iconTheme;
+
+  ///The theme to use for the theming of the [LinkDialog()],
+  ///shown when embedding an image, for example
+  @Deprecated('Use the inherited Widget [QuillTheme] instead')
+  final QuillDialogTheme? dialogTheme;
+
   @override
   Size get preferredSize => axis == Axis.horizontal
       ? Size.fromHeight(toolbarSize)
@@ -635,28 +652,37 @@ class QuillToolbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    return I18n(
-      initialLocale: locale,
-      child: multiRowsDisplay
-          ? Wrap(
-              direction: axis,
-              alignment: toolbarIconAlignment,
-              crossAxisAlignment: toolbarIconCrossAlignment,
-              runSpacing: 4,
-              spacing: toolbarSectionSpacing,
-              children: children,
-            )
-          : Container(
-              constraints: BoxConstraints.tightFor(
-                height: axis == Axis.horizontal ? toolbarSize : null,
-                width: axis == Axis.vertical ? toolbarSize : null,
+    //TODO - Remove QuillTheme from here
+    return QuillTheme(
+      data: QuillThemeData(
+        // ignore: deprecated_member_use_from_same_package
+        dialogTheme: dialogTheme,
+        // ignore: deprecated_member_use_from_same_package
+        iconTheme: iconTheme,
+      ),
+      child: I18n(
+        initialLocale: locale,
+        child: multiRowsDisplay
+            ? Wrap(
+                direction: axis,
+                alignment: toolbarIconAlignment,
+                crossAxisAlignment: toolbarIconCrossAlignment,
+                runSpacing: 4,
+                spacing: toolbarSectionSpacing,
+                children: children,
+              )
+            : Container(
+                constraints: BoxConstraints.tightFor(
+                  height: axis == Axis.horizontal ? toolbarSize : null,
+                  width: axis == Axis.vertical ? toolbarSize : null,
+                ),
+                color: color ?? Theme.of(context).canvasColor,
+                child: ArrowIndicatedButtonList(
+                  axis: axis,
+                  buttons: children,
+                ),
               ),
-              color: color ?? Theme.of(context).canvasColor,
-              child: ArrowIndicatedButtonList(
-                axis: axis,
-                buttons: children,
-              ),
-            ),
+      ),
     );
   }
 }

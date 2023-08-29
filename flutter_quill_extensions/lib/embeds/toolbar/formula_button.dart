@@ -7,8 +7,6 @@ class FormulaButton extends StatelessWidget {
     required this.controller,
     this.iconSize = kDefaultIconSize,
     this.fillColor,
-    this.iconTheme,
-    this.dialogTheme,
     this.tooltip,
     Key? key,
   }) : super(key: key);
@@ -21,14 +19,12 @@ class FormulaButton extends StatelessWidget {
 
   final QuillController controller;
 
-  final QuillIconTheme? iconTheme;
-
-  final QuillDialogTheme? dialogTheme;
   final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final iconTheme = QuillTheme.of(context)?.iconTheme;
 
     final iconColor = iconTheme?.iconUnselectedColor ?? theme.iconTheme.color;
     final iconFillColor =

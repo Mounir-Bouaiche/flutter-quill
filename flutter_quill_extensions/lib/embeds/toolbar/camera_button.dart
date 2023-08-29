@@ -18,7 +18,6 @@ class CameraButton extends StatelessWidget {
     this.webImagePickImpl,
     this.webVideoPickImpl,
     this.cameraPickSettingSelector,
-    this.iconTheme,
     this.tooltip,
     Key? key,
   }) : super(key: key);
@@ -42,12 +41,12 @@ class CameraButton extends StatelessWidget {
 
   final MediaPickSettingSelector? cameraPickSettingSelector;
 
-  final QuillIconTheme? iconTheme;
   final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final iconTheme = QuillTheme.of(context)?.iconTheme;
 
     final iconColor = iconTheme?.iconUnselectedColor ?? theme.iconTheme.color;
     final iconFillColor =
@@ -70,43 +69,15 @@ class CameraButton extends StatelessWidget {
   }
 
   Future<void> _handleCameraButtonTap(
-      BuildContext context, QuillController controller,
-      {OnImagePickCallback? onImagePickCallback,
-      OnVideoPickCallback? onVideoPickCallback,
-      FilePickImpl? filePickImpl,
-      WebImagePickImpl? webImagePickImpl}) async {
+    BuildContext context,
+    QuillController controller, {
+    OnImagePickCallback? onImagePickCallback,
+    OnVideoPickCallback? onVideoPickCallback,
+    FilePickImpl? filePickImpl,
+    WebImagePickImpl? webImagePickImpl,
+  }) async {
     if (onImagePickCallback != null && onVideoPickCallback != null) {
-      final selector = cameraPickSettingSelector ??
-          (context) => showDialog<MediaPickSetting>(
-                context: context,
-                builder: (ctx) => AlertDialog(
-                  contentPadding: EdgeInsets.zero,
-                  backgroundColor: Colors.transparent,
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextButton.icon(
-                        icon: const Icon(
-                          Icons.camera,
-                          color: Colors.orangeAccent,
-                        ),
-                        label: Text('Camera'.i18n),
-                        onPressed: () =>
-                            Navigator.pop(ctx, MediaPickSetting.Camera),
-                      ),
-                      TextButton.icon(
-                        icon: const Icon(
-                          Icons.video_call,
-                          color: Colors.cyanAccent,
-                        ),
-                        label: Text('Video'.i18n),
-                        onPressed: () =>
-                            Navigator.pop(ctx, MediaPickSetting.Video),
-                      )
-                    ],
-                  ),
-                ),
-              );
+      final selector = cameraPickSettingSelector ?? _defaultPickSelector;
 
       final source = await selector(context);
       if (source != null) {
@@ -126,5 +97,38 @@ class CameraButton extends StatelessWidget {
         }
       }
     }
+  }
+
+  Future<MediaPickSetting?> _defaultPickSelector(BuildContext context) {
+    return showDialog<MediaPickSetting>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton.icon(
+                icon: const Icon(
+                  Icons.camera,
+                  color: Colors.orangeAccent,
+                ),
+                label: Text('Camera'.i18n),
+                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Camera),
+              ),
+              TextButton.icon(
+                icon: const Icon(
+                  Icons.video_call,
+                  color: Colors.cyanAccent,
+                ),
+                label: Text('Video'.i18n),
+                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Video),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 }

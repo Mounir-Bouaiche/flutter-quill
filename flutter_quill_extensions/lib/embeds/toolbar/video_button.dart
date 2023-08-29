@@ -15,8 +15,6 @@ class VideoButton extends StatelessWidget {
     this.filePickImpl,
     this.webVideoPickImpl,
     this.mediaPickSettingSelector,
-    this.iconTheme,
-    this.dialogTheme,
     this.tooltip,
     this.linkRegExp,
     Key? key,
@@ -37,10 +35,6 @@ class VideoButton extends StatelessWidget {
 
   final MediaPickSettingSelector? mediaPickSettingSelector;
 
-  final QuillIconTheme? iconTheme;
-
-  final QuillDialogTheme? dialogTheme;
-
   final String? tooltip;
 
   final RegExp? linkRegExp;
@@ -48,6 +42,7 @@ class VideoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final iconTheme = QuillTheme.of(context)?.iconTheme;
 
     final iconColor = iconTheme?.iconUnselectedColor ?? theme.iconTheme.color;
     final iconFillColor =
@@ -94,7 +89,9 @@ class VideoButton extends StatelessWidget {
   void _typeLink(BuildContext context) {
     showDialog<String>(
       context: context,
-      builder: (_) => LinkDialog(dialogTheme: dialogTheme),
+      builder: (_) => LinkDialog(
+        dialogTheme: QuillTheme.of(context)?.dialogTheme,
+      ),
     ).then(_linkSubmitted);
   }
 

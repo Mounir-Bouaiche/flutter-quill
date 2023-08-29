@@ -54,7 +54,7 @@ class FlutterQuillEmbeds {
   }) =>
       [
         if (showImageButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) => ImageButton(
+          (controller, toolbarIconSize) => ImageButton(
                 icon: Icons.image,
                 iconSize: toolbarIconSize,
                 tooltip: imageButtonTooltip,
@@ -63,12 +63,10 @@ class FlutterQuillEmbeds {
                 filePickImpl: filePickImpl,
                 webImagePickImpl: webImagePickImpl,
                 mediaPickSettingSelector: mediaPickSettingSelector,
-                iconTheme: iconTheme,
-                dialogTheme: dialogTheme,
                 linkRegExp: imageLinkRegExp,
               ),
         if (showVideoButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) => VideoButton(
+          (controller, toolbarIconSize) => VideoButton(
                 icon: Icons.movie_creation,
                 iconSize: toolbarIconSize,
                 tooltip: videoButtonTooltip,
@@ -77,13 +75,11 @@ class FlutterQuillEmbeds {
                 filePickImpl: filePickImpl,
                 webVideoPickImpl: webImagePickImpl,
                 mediaPickSettingSelector: mediaPickSettingSelector,
-                iconTheme: iconTheme,
-                dialogTheme: dialogTheme,
                 linkRegExp: videoLinkRegExp,
-          ),
+              ),
         if ((onImagePickCallback != null || onVideoPickCallback != null) &&
             showCameraButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) => CameraButton(
+          (controller, toolbarIconSize) => CameraButton(
                 icon: Icons.photo_camera,
                 iconSize: toolbarIconSize,
                 tooltip: cameraButtonTooltip,
@@ -94,17 +90,13 @@ class FlutterQuillEmbeds {
                 webImagePickImpl: webImagePickImpl,
                 webVideoPickImpl: webVideoPickImpl,
                 cameraPickSettingSelector: cameraPickSettingSelector,
-                iconTheme: iconTheme,
               ),
         if (showFormulaButton)
-          (controller, toolbarIconSize, iconTheme, dialogTheme) =>
-              FormulaButton(
+          (controller, toolbarIconSize) => FormulaButton(
                 icon: Icons.functions,
                 iconSize: toolbarIconSize,
                 tooltip: formulaButtonTooltip,
                 controller: controller,
-                iconTheme: iconTheme,
-                dialogTheme: dialogTheme,
               )
       ];
 }

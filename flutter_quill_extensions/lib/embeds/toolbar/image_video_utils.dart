@@ -86,6 +86,8 @@ class ImageVideoUtils {
       showDialog<MediaPickSetting>(
         context: context,
         builder: (ctx) => AlertDialog(
+          backgroundColor:
+              QuillTheme.of(context)?.dialogTheme?.dialogBackgroundColor,
           contentPadding: EdgeInsets.zero,
           content: Column(
             mainAxisSize: MainAxisSize.min,

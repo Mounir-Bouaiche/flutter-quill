@@ -15,8 +15,6 @@ class ImageButton extends StatelessWidget {
     this.filePickImpl,
     this.webImagePickImpl,
     this.mediaPickSettingSelector,
-    this.iconTheme,
-    this.dialogTheme,
     this.tooltip,
     this.linkRegExp,
     Key? key,
@@ -37,15 +35,13 @@ class ImageButton extends StatelessWidget {
 
   final MediaPickSettingSelector? mediaPickSettingSelector;
 
-  final QuillIconTheme? iconTheme;
-
-  final QuillDialogTheme? dialogTheme;
   final String? tooltip;
   final RegExp? linkRegExp;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final iconTheme = QuillTheme.of(context)?.iconTheme;
 
     final iconColor = iconTheme?.iconUnselectedColor ?? theme.iconTheme.color;
     final iconFillColor =
@@ -93,7 +89,7 @@ class ImageButton extends StatelessWidget {
     showDialog<String>(
       context: context,
       builder: (_) => LinkDialog(
-        dialogTheme: dialogTheme,
+        dialogTheme: QuillTheme.of(context)?.dialogTheme,
         linkRegExp: linkRegExp,
       ),
     ).then(_linkSubmitted);
