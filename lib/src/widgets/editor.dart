@@ -192,12 +192,14 @@ class QuillEditor extends StatefulWidget {
     this.dialogTheme,
     this.contentInsertionConfiguration,
     this.contextMenuBuilder,
+    this.editorKey,
     Key? key,
   }) : super(key: key);
 
   factory QuillEditor.basic({
     required QuillController controller,
     required bool readOnly,
+    Key? key,
     Brightness? keyboardAppearance,
     Iterable<EmbedBuilder>? embedBuilders,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
@@ -205,12 +207,14 @@ class QuillEditor extends StatefulWidget {
     bool expands = false,
     FocusNode? focusNode,
     String? placeholder,
+    GlobalKey<EditorState>? editorKey,
 
     /// The locale to use for the editor toolbar, defaults to system locale
     /// More at https://github.com/singerdmx/flutter-quill#translation
     Locale? locale,
   }) {
     return QuillEditor(
+      key: key,
       controller: controller,
       scrollable: true,
       focusNode: focusNode,
@@ -222,6 +226,7 @@ class QuillEditor extends StatefulWidget {
       locale: locale,
       embedBuilders: embedBuilders,
       placeholder: placeholder,
+      editorKey: editorKey,
     );
   }
 
@@ -447,22 +452,31 @@ class QuillEditor extends StatefulWidget {
   /// See [https://api.flutter.dev/flutter/widgets/EditableText/contentInsertionConfiguration.html]
   final ContentInsertionConfiguration? contentInsertionConfiguration;
 
+  /// Using the editorKey for get getLocalRectForCaret
+  /// editorKey.currentState?.renderEditor.getLocalRectForCaret
+  final GlobalKey<EditorState>? editorKey;
+
   @override
   QuillEditorState createState() => QuillEditorState();
 }
 
 class QuillEditorState extends State<QuillEditor>
     implements EditorTextSelectionGestureDetectorBuilderDelegate {
-  final GlobalKey<EditorState> _editorKey = GlobalKey<EditorState>();
+  late GlobalKey<EditorState> _editorKey;
   late EditorTextSelectionGestureDetectorBuilder
       _selectionGestureDetectorBuilder;
+  late FocusNode _focusNode;
+
+  FocusNode get focusNode => _focusNode;
 
   @override
   void initState() {
     super.initState();
+    _editorKey = widget.editorKey ?? GlobalKey<EditorState>();
     _selectionGestureDetectorBuilder =
         _QuillEditorSelectionGestureDetectorBuilder(
             this, widget.detectWordBoundary);
+    _focusNode = widget.focusNode ?? FocusNode();
   }
 
   @override
@@ -504,7 +518,7 @@ class QuillEditorState extends State<QuillEditor>
     final child = RawEditor(
       key: _editorKey,
       controller: widget.controller,
-      focusNode: widget.focusNode ?? FocusNode(),
+      focusNode: _focusNode,
       scrollController: widget.scrollController ?? ScrollController(),
       scrollable: widget.scrollable,
       scrollBottomInset: widget.scrollBottomInset,

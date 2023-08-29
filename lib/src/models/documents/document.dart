@@ -156,7 +156,19 @@ class Document {
   /// included in the result.
   Style collectStyle(int index, int len) {
     final res = queryChild(index);
-    return (res.node as Line).collectStyle(res.offset, len);
+    // -1 because the cursor is at the part of the line that is not visible
+    // Bug: When the caret is in the middle of the paragraph
+    // and at the end of the format string, it will display the wrong state
+    // of the format button
+    final isLinkStyle =
+        res.node?.style.attributes[Attribute.link.key]?.value == true;
+    // In this case, we have an exception, this is a link.
+    // When node is a link we will not -1
+    return (res.node as Line).collectStyle(
+        len == 0 && res.node != null && !isLinkStyle
+            ? res.offset - 1
+            : res.offset,
+        len);
   }
 
   /// Returns all styles and Embed for each node within selection
@@ -195,16 +207,21 @@ class Document {
     return block.queryChild(res.offset, true);
   }
 
-  /// Search the whole document for any substring matching the pattern
-  /// Returns the offsets that matches the pattern
-  List<int> search(Pattern other) {
+  /// Search given [substring] in the whole document
+  /// Supports [caseSensitive] and [wholeWord] options
+  /// Returns correspondent offsets
+  List<int> search(
+    String substring, {
+    bool caseSensitive = false,
+    bool wholeWord = false,
+  }) {
     final matches = <int>[];
     for (final node in _root.children) {
       if (node is Line) {
-        _searchLine(other, node, matches);
+        _searchLine(substring, caseSensitive, wholeWord, node, matches);
       } else if (node is Block) {
         for (final line in Iterable.castFrom<dynamic, Line>(node.children)) {
-          _searchLine(other, line, matches);
+          _searchLine(substring, caseSensitive, wholeWord, line, matches);
         }
       } else {
         throw StateError('Unreachable.');
@@ -213,10 +230,22 @@ class Document {
     return matches;
   }
 
-  void _searchLine(Pattern other, Line line, List<int> matches) {
+  void _searchLine(
+    String substring,
+    bool caseSensitive,
+    bool wholeWord,
+    Line line,
+    List<int> matches,
+  ) {
     var index = -1;
+    final lineText = line.toPlainText();
+    var pattern = RegExp.escape(substring);
+    if (wholeWord) {
+      pattern = r'\b' + pattern + r'\b';
+    }
+    final searchExpression = RegExp(pattern, caseSensitive: caseSensitive);
     while (true) {
-      index = line.toPlainText().indexOf(other, index + 1);
+      index = lineText.indexOf(searchExpression, index + 1);
       if (index < 0) {
         break;
       }

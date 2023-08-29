@@ -16,9 +16,9 @@ extension QuillEnterText on WidgetTester {
                 find.byType(QuillEditor, skipOffstage: finder.skipOffstage),
             matchRoot: true),
       );
-      editor.widget.focusNode.requestFocus();
+      editor.focusNode.requestFocus();
       await pump();
-      expect(editor.widget.focusNode.hasFocus, isTrue);
+      expect(editor.focusNode.hasFocus, isTrue);
     });
   }
 

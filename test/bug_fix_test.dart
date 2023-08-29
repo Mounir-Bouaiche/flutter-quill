@@ -43,10 +43,13 @@ void main() {
     group('1189 - The provided text position is not in the current node', () {
       late QuillController controller;
       late QuillEditor editor;
+      late GlobalKey<QuillEditorState> editorKey;
 
       setUp(() {
+        editorKey = GlobalKey<QuillEditorState>();
         controller = QuillController.basic();
-        editor = QuillEditor.basic(controller: controller, readOnly: false);
+        editor = QuillEditor.basic(
+            controller: controller, readOnly: false, key: editorKey);
       });
 
       tearDown(() {
@@ -58,10 +61,13 @@ void main() {
         await tester.pumpWidget(MaterialApp(home: Column(children: [editor])));
         await tester.quillEnterText(find.byType(QuillEditor), 'test\n');
 
-        editor.focusNode.unfocus();
+        final finder = find.byKey(editorKey);
+        final editorState = tester.state<QuillEditorState>(finder);
+
+        editorState.focusNode.unfocus();
         await tester.pump();
         controller.clear();
-        editor.focusNode.requestFocus();
+        editorState.focusNode.requestFocus();
         await tester.pump();
         expect(tester.takeException(), isNull);
       });
@@ -71,11 +77,14 @@ void main() {
         await tester.pumpWidget(MaterialApp(home: Column(children: [editor])));
         await tester.quillEnterText(find.byType(QuillEditor), 'test\n');
 
+        final finder = find.byKey(editorKey);
+        final editorState = tester.state<QuillEditorState>(finder);
+
         controller.formatSelection(Attribute.ul);
-        editor.focusNode.unfocus();
+        editorState.focusNode.unfocus();
         await tester.pump();
         controller.formatSelection(const ListAttribute(null));
-        editor.focusNode.requestFocus();
+        editorState.focusNode.requestFocus();
         await tester.pump();
         expect(tester.takeException(), isNull);
       });
@@ -84,8 +93,11 @@ void main() {
         await tester.pumpWidget(MaterialApp(home: Column(children: [editor])));
         await tester.quillEnterText(find.byType(QuillEditor), 'test\n');
 
+        final finder = find.byKey(editorKey);
+        final editorState = tester.state<QuillEditorState>(finder);
+
         controller.formatSelection(Attribute.unchecked);
-        editor.focusNode.unfocus();
+        editorState.focusNode.unfocus();
         await tester.pump();
         await tester.tap(find.byType(CheckboxPoint));
         expect(tester.takeException(), isNull);
